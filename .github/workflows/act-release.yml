@@ -8,6 +8,28 @@ on:
     tags:
       - v*
   workflow_dispatch:
+    inputs:
+      spellcheck: 
+        type: boolean
+        default: true
+      no-features-test:
+        type: boolean
+        default: true
+      linux-hosts:
+        type: boolean
+        default: true
+      linux-armv7l:
+        type: boolean
+        default: true
+      musl-amd64:
+        type: boolean
+        default: true
+      macos-hosts:
+        type: boolean
+        default: true
+      windows-hosts:
+        type: boolean
+        default: true
 
 env:
 #  CMAKE_BUILD_TYPE: ${{ vars.CMAKE_BUILD_TYPE || 'RelWithDebInfo' }}
@@ -15,6 +37,7 @@ env:
 
 jobs:
   spellcheck:
+    if: ${{ inputs.spellcheck }}
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +54,7 @@ jobs:
         run: codespell
 
   no-features-test:
+    if: ${{ inputs.no-features-test }}
     name: No-features-test
     runs-on: ubuntu-latest
     permissions:
@@ -68,6 +92,7 @@ jobs:
         run: ctest --output-on-failure
 
   linux-hosts:
+    if: ${{ inputs.linux-hosts }}
     name: Linux-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -163,6 +188,7 @@ jobs:
           path: ./fastfetch-*.*
 
   linux-armv7l:
+    if: ${{ inputs.linux-armv7l }}
     name: Linux-armv7l
     runs-on: ubuntu-24.04
     permissions:
@@ -203,6 +229,7 @@ jobs:
           path: ./fastfetch-*.*
 
   musl-amd64:
+    if: ${{ inputs.musl-amd64 }}
     name: Musl-amd64
     runs-on: ubuntu-latest
     steps:
@@ -241,6 +268,7 @@ jobs:
           path: ./fastfetch-*.*
 
   macos-hosts:
+    if: ${{ inputs.macos-hosts }}
     name: macOS-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -295,6 +323,7 @@ jobs:
           path: ./fastfetch-*.*
 
   windows-hosts:
+    if: ${{ inputs.windows-hosts }}
     name: Windows-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
