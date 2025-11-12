@@ -1,0 +1,85 @@
+# act-release-win-test.yml
+name: act-release-win-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows-hosts:
+        type: boolean
+        default: true
+env:
+#  CMAKE_BUILD_TYPE: ${{ vars.CMAKE_BUILD_TYPE || 'RelWithDebInfo' }}
+  CMAKE_BUILD_TYPE: ${{ vars.CMAKE_BUILD_TYPE || 'Release' }}
+
+jobs:
+  windows-hosts:
+    if: ${{ inputs.windows-hosts }} || ${{ github.event_name == 'push' }}
+    name: Windows-${{ matrix.arch }}
+    runs-on: ${{ matrix.runs-on }}
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runs-on: windows-latest
+            msystem: CLANG64
+            msystem-lower: clang64
+            msys-arch: x86_64
+          - arch: aarch64
+            runs-on: windows-11-arm
+            msystem: CLANGARM64
+            msystem-lower: clangarm64
+            msys-arch: aarch64
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v5
+
+      - name: setup-msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: git 
+
+      - name: print msys version
+        run: uname -a
+
+      - name: Prepare to Sign windows executable files
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir signed
+          cp LICENSE signed/
+          cp *.dll signed/
+          cp fastfetch.exe signed/
+          cp flashfetch.exe signed/
+          cp -r presets signed/
+          ls -la signed/
+
+      - name: Prepare to Sign windows executable files (2)
+        continue-on-error: true
+        shell: cmd
+        run: |
+          dir 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x86\signtool.exe'
+          dir 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x86\*.exe'
+
+      - name: Prepare to Sign windows executable files (3)
+        continue-on-error: true
+        run: |
+          ls -la 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe';
+
+      - name: Sign windows executable files
+        continue-on-error: true
+        uses: deep-soft/code-sign-action@v10
+        with:
+          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
+          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
+          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
+          # certificatename: '${{ secrets.CERTNAME }}'
+          folder: 'signed'
+          recursive: true
