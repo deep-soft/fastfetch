@@ -417,7 +417,7 @@ jobs:
           password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
           certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
           # certificatename: '${{ secrets.CERTNAME }}'
-          folder: './'
+          folder: '.'
           recursive: true
 
       - name: create zip archive
@@ -461,7 +461,7 @@ jobs:
         continue-on-error: true
         uses: ncipollo/release-action@v1
         with:
-          skipIfReleaseExists: true
+          #skipIfReleaseExists: true
           updateOnlyUnreleased: false
           allowUpdates: true
           tag: ${{ needs.linux-hosts.outputs.ffversion }}
