@@ -458,8 +458,12 @@ jobs:
 
       - name: create release
         if: github.event_name == 'push' || needs.linux-hosts.outputs.ffversion != steps.get_version_release.outputs.release
+        continue-on-error: true
         uses: ncipollo/release-action@v1
         with:
+          skipIfReleaseExists: true
+          updateOnlyUnreleased: false
+          allowUpdates: true
           tag: ${{ needs.linux-hosts.outputs.ffversion }}
           commit: ${{ github.sha }}
           artifactErrorsFailBuild: true
