@@ -37,7 +37,7 @@ env:
 
 jobs:
   spellcheck:
-    if: ${{ inputs.spellcheck }}
+    if: ${{ inputs.spellcheck }} || ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
         run: codespell
 
   no-features-test:
-    if: ${{ inputs.no-features-test }}
+    if: ${{ inputs.no-features-test }} || ${{ github.event_name == 'push' }}
     name: No-features-test
     runs-on: ubuntu-latest
     permissions:
@@ -92,7 +92,7 @@ jobs:
         run: ctest --output-on-failure
 
   linux-hosts:
-    if: ${{ inputs.linux-hosts }}
+    if: ${{ inputs.linux-hosts }} || ${{ github.event_name == 'push' }}
     name: Linux-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -188,7 +188,7 @@ jobs:
           path: ./fastfetch-*.*
 
   linux-armv7l:
-    if: ${{ inputs.linux-armv7l }}
+    if: ${{ inputs.linux-armv7l }} || ${{ github.event_name == 'push' }}
     name: Linux-armv7l
     runs-on: ubuntu-24.04
     permissions:
@@ -229,7 +229,7 @@ jobs:
           path: ./fastfetch-*.*
 
   musl-amd64:
-    if: ${{ inputs.musl-amd64 }}
+    if: ${{ inputs.musl-amd64 }} || ${{ github.event_name == 'push' }}
     name: Musl-amd64
     runs-on: ubuntu-latest
     steps:
@@ -268,7 +268,7 @@ jobs:
           path: ./fastfetch-*.*
 
   macos-hosts:
-    if: ${{ inputs.macos-hosts }}
+    if: ${{ inputs.macos-hosts }} || ${{ github.event_name == 'push' }}
     name: macOS-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -323,7 +323,7 @@ jobs:
           path: ./fastfetch-*.*
 
   windows-hosts:
-    if: ${{ inputs.windows-hosts }}
+    if: ${{ inputs.windows-hosts }} || ${{ github.event_name == 'push' }}
     name: Windows-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
