@@ -106,7 +106,7 @@ jobs:
           - arch: aarch64
             runs-on: ubuntu-22.04-arm
     outputs:
-      ffversion: ${{ steps.ffversion.outputs.ffversion }}
+      ffversion: v${{ steps.ffversion.outputs.ffversion }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v5
@@ -480,3 +480,4 @@ jobs:
           commit: ${{ github.sha }}
           bodyFile: fastfetch-release-notes.md
           allowUpdates: true
+          artifacts: fastfetch-release-notes.md
