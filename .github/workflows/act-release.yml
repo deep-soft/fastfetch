@@ -2,8 +2,8 @@
 name: act-release
 
 on:
-#  - push
-#  - pull_request
+  #- push
+  #- pull_request
   push:
     tags:
       - v*
