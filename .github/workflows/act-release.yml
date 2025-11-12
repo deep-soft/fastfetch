@@ -4,6 +4,9 @@ name: act-release
 on:
 #  - push
 #  - pull_request
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 
 env:
