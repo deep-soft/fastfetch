@@ -39,7 +39,7 @@ static const FFlogo A[] = {
             FF_COLOR_FG_256 "36",
         },
     },
-    // Aeon
+    // AerynOS
     {
         .names = {"AerynOS"},
         .lines = FASTFETCH_DATATEXT_LOGO_AERYNOS,
@@ -179,6 +179,20 @@ static const FFlogo A[] = {
         .colors = {
             FF_COLOR_FG_WHITE,
             FF_COLOR_FG_256 "178",
+        }
+    },
+    // Amiga
+    {
+        .names = {"Amiga"},
+        .lines = FASTFETCH_DATATEXT_LOGO_AMIGA,
+        .colors = {
+            FF_COLOR_FG_RED,
+            FF_COLOR_FG_LIGHT_RED,
+            FF_COLOR_FG_YELLOW,
+            FF_COLOR_FG_BLUE,
+            FF_COLOR_FG_CYAN,
+            FF_COLOR_FG_LIGHT_YELLOW,
+            FF_COLOR_FG_GREEN,
         }
     },
     // AmogOS
@@ -2143,7 +2157,7 @@ static const FFlogo G[] = {
     // GXDE
     {
         .names = {"GXDE"},
-        .lines = FASTFETCH_DATATEXT_LOGO_DEEPIN,
+        .lines = FASTFETCH_DATATEXT_LOGO_GXDE,
         .colors = {
             FF_COLOR_FG_RED,
         },
@@ -3441,12 +3455,6 @@ static const FFlogo O[] = {
             FF_COLOR_FG_LIGHT_BLACK,
         }
     },
-    // Opak
-    {
-        .names = {"Opak"},
-        .lines = FASTFETCH_DATATEXT_LOGO_OPAK,
-        .colors = {}, // #1070
-    },
     // OpenKylin
     {
         .names = {"openkylin", "open-kylin"},
@@ -3685,6 +3693,15 @@ static const FFlogo O[] = {
             FF_COLOR_FG_DEFAULT,
             FF_COLOR_FG_DEFAULT,
         },
+    },
+    // OS/2 Warp
+    {
+        .names = {"OS2Warp"},
+        .lines = FASTFETCH_DATATEXT_LOGO_OS2WARP,
+        .colors = {
+            FF_COLOR_FG_LIGHT_WHITE,
+            FF_COLOR_FG_LIGHT_BLUE,
+        }
     },
     // OS_Elbrus
     {
