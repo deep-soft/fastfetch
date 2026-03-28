@@ -1,3 +1,88 @@
+# 2.61.0
+
+Changes:
+* Support for Windows 7 and 8 has been removed.
+    * Windows 8.1 is now the oldest version supported by fastfetch.
+* The GPU module on WSL no longer relies on `DXCore`.
+    * The `directx-headers` dependency is no longer required.
+    * Fastfetch on Linux is now pure C; a C++ compiler is no longer required.
+    * GPU type detection is now slightly less accurate, but detection speed should be slightly faster.
+* The GPU module on Windows now uses `DXCore` for more accurate GPU type detection (requires Windows 10 or later).
+    * This feature is built only when `DXCore` headers are available, which requires installing `mingw-w64-<msystem>-x86_64-directx-headers` on MSYS2.
+
+Features:
+* Adds a `brightness` option for color display configuration (#2238, Colors)
+* Adds support for detecting Bluetooth keyboards on Linux (#2220, Keyboard)
+* Adds support for detecting GlazeWM (WM, macOS)
+* Adds a `showEmptySlots` option to display empty memory slots on Linux (#2222, PhysicalMemory)
+* Adds marketing product name detection on Asahi Linux (Host, Linux)
+* Adds support for new M5 Mac models (Host, macOS)
+* Improves SMBIOS robustness by validating malformed data and improving error handling
+* Improves reliability when terminating child processes (Processing, Windows)
+* Improves Intel Mac support by querying SMBIOS data directly (Global, macOS)
+* Includes numerous internal cleanups and optimizations
+
+Bugfixes:
+* Fixes missing memory devices on some machines (PhysicalMemory)
+* Fixes CPUCache deduplication for shared caches (#2228, CPUCache, Linux)
+* Fixes WM version reporting for niri (#2218, WM, Linux)
+* Fixes SSID decoding issues from `iw` output (Wifi, Linux)
+* Fixes the CMD code page being changed after running fastfetch on Windows (#2245, Windows)
+
+# 2.60.0
+
+Changes:
+* The CMake option `ENABLE_WIN7_COMPAT:BOOLEAN` now defaults to `OFF` and will be removed in v2.61.0, effectively dropping support for Windows 7 in the next release.
+    * This follows the Windows 7 deprecation notice introduced in v2.57.0.
+* `wm.detectPlugin` now defaults to `true` (WM)
+
+Features:
+* Adds `{cwd}` for custom title formatting, which displays the current working directory (Title)
+* Adds support for detecting the Zed version (#2200, Editor)
+* Adds support for detecting `moss` packages (Packages, Linux)
+* Adds support for detecting komorebi, FancyWM, and GlazeWM (WM, Windows)
+* Adds support for WM plugin version detection on macOS (WM, macOS)
+* Adds support for retrieving the executable path on OpenBSD (#2195, OpenBSD)
+
+Bugfixes:
+* Fixes a potential segmentation fault caused by dereferencing a negative index (#2198)
+* Fixes `tempSensor` parsing so that it accepts only string values (#2202, CPU)
+* Fixes an issue that unexpectedly caused fewer devices to be reported (Keyboard, Linux)
+* Improves WM detection on LXQt by querying WM settings only when no WM has already been detected (#2199, WM, Linux)
+* Fixes memory leaks in DBus connection handling and in the OpenGL EGL context lifecycle
+* Fixes niri version detection on Fedora (WM, Linux)
+* Includes various internal cleanups and optimizations
+
+Logos:
+* Adds `RengeOS` (#2170)
+* Adds `Emmabuntüs` (#2207)
+* Updates Artix Linux (#2157)
+* Updates Linux Mint (#2186)
+* Renames `Refracted Devuan` to `Refracta`
+* Renames `ExodiaPredator` to `ExodiaOS`
+
+# 2.59.0
+
+Changes:
+* Fastfetch no longer relies on the unreliable environment variables `$USER` or `%USERPROFILE%` to determine the current username (Title)
+    * People who set `$USER` to customize the Fastfetch title should use `{ "type": "title", "format": "your-custom-user-name" }` to achieve the same result.
+* Fastfetch no longer tries to probe inaccessible remote disk drives on Windows (Disk, Windows)
+    * People who have remote drives may use `{ "type": "disk", "hideFolders": "X:\\" }` to ignore problematic ones.
+    * This change removes some ugly hacks from the codebase and matches the behavior on `*nix`.
+
+Features:
+* Adds Oracle Solaris support (#2176, SunOS)
+* Adds UID / SID detection (Title)
+    * In custom format: `{user-id}`
+* Switches to native GPU detection on GNU/Hurd and removes the `libpciaccess` dependency (GPU, Hurd)
+* Improves memory size detection on macOS (Memory, macOS)
+    * Avoids relying on `hw.memsize_usable` by default, which may not be available on older macOS versions
+* Improves Windows disk detection accuracy and performance (Disk, Windows)
+* Adds more ARM CPU parts and removes duplicated cases (CPU, ARM)
+
+Logos:
+* Adds 6-color support to the NixOS logo (including the small variant) (#2180)
+
 # 2.58.0
 
 An early release to fix compatibility issues with KDE Plasma 6.6.
@@ -13,7 +98,7 @@ Features:
 * Honors the `DBPath` and `RootDir` settings in `pacman.conf` when detecting Pacman packages (#2154, Packages, Linux)
 
 Bugfixes:
-* Fixes a crash issues on KDE Plasma 6.6 (Display, Linux)
+* Fixes a crash issue on KDE Plasma 6.6 (Display, Linux)
 * Fixes the Command module not working with `--dynamic-interval` (#2152, Command)
 * Fixes Quartz Compositor version detection. It now correctly reports the version of `WindowServer` (`SkyLight`) instead of `WindowManager`. (WM, macOS)
 
@@ -40,7 +125,7 @@ Deprecation notice:
 * Support for Windows 7 (and 8.x) is deprecated and will be removed in a future release. Extended support for Windows 7 (and 8.1) ended on January 10, 2023. These versions do not officially support ANSI escape codes (running fastfetch on them requires a third-party terminal such as ConEmu). In addition, Windows 7 lacks some APIs used by fastfetch. Fastfetch currently loads these APIs dynamically at runtime to maintain compatibility, but this adds complexity to the codebase and increases the maintenance burden.
     * A CMake flag `ENABLE_WIN7_COMPAT:BOOLEAN` has been introduced (defaults to `ON` for now). If set to `OFF`, Windows 7 compatibility code is excluded, and the resulting binaries will support only Windows 10 (version 1607 and later) and Windows 11.
     * The main prebuilt Windows binaries on the Release page (`fastfetch-windows-amd64.*`) are built with `ENABLE_WIN7_COMPAT=OFF`. These are the binaries used by `scoop` and `winget`. Users who need Windows 7 (or 8.x) support can download the `-win7` variant instead.
-    * The `ENABLE_WIN7_COMPAT` CMake option and the `-win7` variant binaries are planned to be removed in 2.60.0.
+    * ~~The `ENABLE_WIN7_COMPAT` CMake option and the `-win7` variant binaries are planned to be removed in 2.60.0~~.
 
 Features:
 * Supports COSMIC DE version detection (DE, Linux)

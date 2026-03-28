@@ -226,9 +226,12 @@ static void applyPrettyNameIfDE(FFDisplayServerResult* result, const char* name)
     ) {
         ffStrbufSetS(&result->deProcessName, "lxqt-session");
         ffStrbufSetS(&result->dePrettyName, FF_DE_PRETTY_LXQT);
-        FF_STRBUF_AUTO_DESTROY wmProcessNameBuffer = ffStrbufCreate();
-        ffParsePropFileConfig("lxqt/session.conf", "window_manager =", &wmProcessNameBuffer);
-        applyBetterWM(result, wmProcessNameBuffer.chars);
+        if (result->wmProcessName.length == 0)
+        {
+            FF_STRBUF_AUTO_DESTROY wmProcessNameBuffer = ffStrbufCreate();
+            ffParsePropFileConfig("lxqt/session.conf", "window_manager =", &wmProcessNameBuffer);
+            applyBetterWM(result, wmProcessNameBuffer.chars);
+        }
     }
 
     else if(
@@ -266,7 +269,7 @@ static void applyPrettyNameIfDE(FFDisplayServerResult* result, const char* name)
 
 static const char* getFromProcesses(FFDisplayServerResult* result)
 {
-    uint32_t userId = getuid();
+    uint32_t userId = instance.state.platform.uid;
 
 #if __FreeBSD__
     #ifdef __DragonFly__
@@ -299,7 +302,7 @@ static const char* getFromProcesses(FFDisplayServerResult* result)
 #elif __OpenBSD__
     kvm_t* kd = kvm_open(NULL, NULL, NULL, KVM_NO_FILES, NULL);
     int count = 0;
-    const struct kinfo_proc* proc = kvm_getprocs(kd, KERN_PROC_UID, userId, sizeof(*proc), &count);
+    const struct kinfo_proc* proc = kvm_getprocs(kd, KERN_PROC_UID, (int) userId, sizeof(*proc), &count);
     if (proc)
     {
         for (int i = 0; i < count; ++i)

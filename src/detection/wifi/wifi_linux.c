@@ -47,7 +47,7 @@ typedef enum {
 static const char* detectWifiWithNm(FFWifiResult* item, FFstrbuf* buffer)
 {
     FF_DEBUG("Starting NetworkManager wifi detection for interface %s", item->inf.description.chars);
-    FFDBusData dbus;
+    FF_DBUS_AUTO_DESTROY_DATA FFDBusData dbus = {};
     const char* error = ffDBusLoadData(DBUS_BUS_SYSTEM, &dbus);
     if(error)
     {
@@ -254,6 +254,7 @@ static const char* detectWifiWithNm(FFWifiResult* item, FFstrbuf* buffer)
     }
 
     FF_DEBUG("NetworkManager wifi detection completed successfully");
+    dbus.lib->ffdbus_message_unref(reply);
     return NULL;
 }
 #endif // FF_HAVE_DBUS
@@ -296,7 +297,11 @@ static const char* detectWifiWithIw(FFWifiResult* item, FFstrbuf* buffer)
     FF_DEBUG("BSSID: %s", item->conn.bssid.chars);
 
     if(ffParsePropLines(output.chars, "SSID: ", &item->conn.ssid))
+    {
         FF_DEBUG("SSID: %s", item->conn.ssid.chars);
+        if (ffStrbufDecodeHexEscapeSequences(&item->conn.ssid))
+            FF_DEBUG("Decoded SSID: %s", item->conn.ssid.chars);
+    }
     else
         FF_DEBUG("SSID not found in iw output");
 
@@ -370,7 +375,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
     FF_AUTO_CLOSE_FD int sock = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if(sock < 0)
     {
-        FF_DEBUG("Failed to create socket: %m");
+        FF_DEBUG("Failed to create socket: %s", strerror(errno));
         return "socket() failed";
     }
 
@@ -390,7 +395,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         FF_DEBUG("SSID: %s", item->conn.ssid.chars);
     }
     else
-        FF_DEBUG("Failed to get SSID via ioctl: %m");
+        FF_DEBUG("Failed to get SSID via ioctl: %s", strerror(errno));
 
     // Get protocol name
     FF_DEBUG("Getting protocol name via ioctl");
@@ -403,7 +408,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         FF_DEBUG("Protocol: %s", item->conn.protocol.chars);
     }
     else
-        FF_DEBUG("Failed to get protocol name via ioctl: %m");
+        FF_DEBUG("Failed to get protocol name via ioctl: %s", strerror(errno));
 
     // Get BSSID
     FF_DEBUG("Getting BSSID via ioctl");
@@ -415,7 +420,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         FF_DEBUG("BSSID: %s", item->conn.bssid.chars);
     }
     else
-        FF_DEBUG("Failed to get BSSID via ioctl: %m");
+        FF_DEBUG("Failed to get BSSID via ioctl: %s", strerror(errno));
 
     // Get bitrate
     FF_DEBUG("Getting bitrate via ioctl");
@@ -425,7 +430,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         FF_DEBUG("TX bitrate: %.2f Mbps", item->conn.txRate);
     }
     else
-        FF_DEBUG("Failed to get bitrate via ioctl: %m");
+        FF_DEBUG("Failed to get bitrate via ioctl: %s", strerror(errno));
 
     // Get frequency/channel
     FF_DEBUG("Getting frequency via ioctl");
@@ -455,7 +460,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         }
     }
     else
-        FF_DEBUG("Failed to get frequency via ioctl: %m");
+        FF_DEBUG("Failed to get frequency via ioctl: %s", strerror(errno));
 
     // Get signal strength
     FF_DEBUG("Getting signal stats via ioctl");
@@ -471,7 +476,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         FF_DEBUG("Signal level: %d dBm, quality: %.0f%%", level, item->conn.signalQuality);
     }
     else
-        FF_DEBUG("Failed to get signal stats via ioctl: %m");
+        FF_DEBUG("Failed to get signal stats via ioctl: %s", strerror(errno));
 
     // Get security info
     FF_DEBUG("Getting security info via ioctl");
@@ -510,7 +515,7 @@ static const char* detectWifiWithIoctls(FFWifiResult* item)
         }
     }
     else
-        FF_DEBUG("Failed to get security info via ioctl: %m");
+        FF_DEBUG("Failed to get security info via ioctl: %s", strerror(errno));
 
     FF_DEBUG("ioctl wifi detection completed");
     return NULL;
@@ -523,7 +528,7 @@ const char* ffDetectWifi(FF_MAYBE_UNUSED FFlist* result)
     struct if_nameindex* infs = if_nameindex();
     if(!infs)
     {
-        FF_DEBUG("if_nameindex() failed: %m");
+        FF_DEBUG("if_nameindex() failed: %s", strerror(errno));
         return "if_nameindex() failed";
     }
 

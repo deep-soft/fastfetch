@@ -23,7 +23,7 @@ static void createSubfolders(const char* fileName)
 {
     FF_STRBUF_AUTO_DESTROY path = ffStrbufCreate();
 
-    char *token = NULL;
+    const char *token = NULL;
     while((token = strchr(fileName, '/')) != NULL)
     {
         ffStrbufAppendNS(&path, (uint32_t)(token - fileName + 1), fileName);
@@ -95,42 +95,6 @@ bool ffAppendFDBuffer(int fd, FFstrbuf* buffer)
     buffer->chars[buffer->length] = '\0';
 
     return buffer->length > 0;
-}
-
-ssize_t ffReadFileData(const char* fileName, size_t dataSize, void* data)
-{
-    int FF_AUTO_CLOSE_FD fd = open(fileName, O_RDONLY | O_CLOEXEC);
-    if(fd == -1)
-        return -1;
-
-    return ffReadFDData(fd, dataSize, data);
-}
-
-ssize_t ffReadFileDataRelative(int dfd, const char* fileName, size_t dataSize, void* data)
-{
-    int FF_AUTO_CLOSE_FD fd = openat(dfd, fileName, O_RDONLY | O_CLOEXEC);
-    if(fd == -1)
-        return -1;
-
-    return ffReadFDData(fd, dataSize, data);
-}
-
-bool ffAppendFileBuffer(const char* fileName, FFstrbuf* buffer)
-{
-    int FF_AUTO_CLOSE_FD fd = open(fileName, O_RDONLY | O_CLOEXEC);
-    if(fd == -1)
-        return false;
-
-    return ffAppendFDBuffer(fd, buffer);
-}
-
-bool ffAppendFileBufferRelative(int dfd, const char* fileName, FFstrbuf* buffer)
-{
-    int FF_AUTO_CLOSE_FD fd = openat(dfd, fileName, O_RDONLY | O_CLOEXEC);
-    if(fd == -1)
-        return false;
-
-    return ffAppendFDBuffer(fd, buffer);
 }
 
 bool ffPathExpandEnv(const char* in, FFstrbuf* out)
