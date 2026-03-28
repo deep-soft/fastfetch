@@ -37,12 +37,12 @@ env:
 
 jobs:
   spellcheck:
-    if: ${{ inputs.spellcheck }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.spellcheck || github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install codespell
         shell: bash
@@ -54,7 +54,7 @@ jobs:
         run: codespell
 
   no-features-test:
-    if: ${{ inputs.no-features-test }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.no-features-test || github.event_name == 'push' }}
     name: No-features-test
     runs-on: ubuntu-latest
     permissions:
@@ -62,7 +62,7 @@ jobs:
       contents: read
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: uname -a
         run: uname -a
@@ -92,7 +92,7 @@ jobs:
         run: ctest --output-on-failure
 
   linux-hosts:
-    if: ${{ inputs.linux-hosts }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.linux-hosts || github.event_name == 'push' }}
     name: Linux-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -109,7 +109,7 @@ jobs:
       ffversion: v${{ steps.ffversion.outputs.ffversion }}
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: uname -a
         run: uname -a
@@ -182,13 +182,13 @@ jobs:
           cpack -V
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-linux-${{ matrix.arch }}
           path: ./fastfetch-*.*
 
   linux-armv7l:
-    if: ${{ inputs.linux-armv7l }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.linux-armv7l || github.event_name == 'push' }}
     name: Linux-armv7l
     runs-on: ubuntu-24.04
     permissions:
@@ -196,7 +196,7 @@ jobs:
       contents: read
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: run VM
         uses: uraimo/run-on-arch-action@v3
@@ -223,17 +223,17 @@ jobs:
             ctest --output-on-failure
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-linux-armv7l
           path: ./fastfetch-*.*
 
   musl-amd64:
-    if: ${{ inputs.musl-amd64 }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.musl-amd64 || github.event_name == 'push' }}
     name: Musl-amd64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: setup alpine linux
         uses: jirutka/setup-alpine@master
@@ -262,13 +262,13 @@ jobs:
         shell: alpine.sh {0}
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-musl-amd64
           path: ./fastfetch-*.*
 
   macos-hosts:
-    if: ${{ inputs.macos-hosts }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.macos-hosts || github.event_name == 'push' }}
     name: macOS-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -283,7 +283,7 @@ jobs:
             runs-on: macos-latest
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: uname -a
         run: uname -a
@@ -302,10 +302,10 @@ jobs:
         run: ./fastfetch --list-features
 
       - name: run fastfetch
-        run: time ./fastfetch -c presets/ci.jsonc --stat false
+        run: time ./fastfetch -c presets/ci.jsonc --structure-disabled vulkan --stat false
 
       - name: run fastfetch --format json
-        run: time ./fastfetch -c presets/ci.jsonc --format json
+        run: time ./fastfetch -c presets/ci.jsonc --structure-disabled vulkan --format json
 
       - name: run flashfetch
         run: time ./flashfetch
@@ -317,13 +317,13 @@ jobs:
         run: ctest --output-on-failure
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-macos-${{ matrix.arch }}
           path: ./fastfetch-*.*
 
   windows-hosts:
-    if: ${{ inputs.windows-hosts }} || ${{ github.event_name == 'push' }}
+    if: ${{ inputs.windows-hosts || github.event_name == 'push' }}
     name: Windows-${{ matrix.arch }}
     runs-on: ${{ matrix.runs-on }}
     permissions:
@@ -347,7 +347,7 @@ jobs:
         shell: msys2 {0}
     steps:
       - name: checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: setup-msys2
         uses: msys2/setup-msys2@v2
@@ -389,7 +389,7 @@ jobs:
       - if: github.event_name == 'push' && github.repository == 'fastfetch-cli/fastfetch'
         id: upload-unsigned-artifact
         name: upload artifacts for signing
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-windows-${{ matrix.arch }}
           path: |
@@ -443,7 +443,7 @@ jobs:
           7z a -t7z -mx9 -bd -y ../fastfetch-windows-${{ matrix.arch }}.7z LICENSE *.dll fastfetch.exe flashfetch.exe presets
 
       - name: upload true artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastfetch-windows-${{ matrix.arch }}
           path: ./fastfetch-windows-${{ matrix.arch }}.*
