@@ -188,7 +188,8 @@ jobs:
           path: ./fastfetch-*.*
 
   linux-armv7l:
-    if: ${{ inputs.linux-armv7l || github.event_name == 'push' }}
+    # if: ${{ inputs.linux-armv7l || github.event_name == 'push' }}
+    if: ${{ inputs.linux-armv7l }}
     name: Linux-armv7l
     runs-on: ubuntu-24.04
     permissions:
