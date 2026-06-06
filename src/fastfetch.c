@@ -7,7 +7,7 @@
 #include "common/io.h"
 #include "common/jsonconfig.h"
 #include "common/time.h"
-#include "common/stringUtils.h"
+#include "common/strutil.h"
 #include "common/mallocHelper.h"
 #include "fastfetch_datatext.h"
 
@@ -765,9 +765,12 @@ static void run(FFdata* data) {
         }
 
         if (instance.state.dynamicInterval > 0) {
+            ffLogoPrintRemaining(); // `logoLineCacheClear` inside so that ffLogoPrintLine will use `\e[nC` to move the cursor to the right position instead of reprinting the logo
+            fputs("\e[J", stdout); // Clear from cursor to the end of the screen to prevent artifacts when the new output is shorter than the previous one
             fflush(stdout);
             ffTimeSleep(instance.state.dynamicInterval);
-            fputs("\e[H", stdout);
+            fputs("\e[H", stdout); // Move cursor to the top left corner to overwrite the previous output
+            instance.state.keysHeight = 0; // Reset keysHeight so `ffLogoPrintRemaining` will recalculate it
         } else {
             break;
         }
